@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NuLeaf Sales Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #1e3a8a 0%, #3730a3 50%, #1e40af 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 20px;
+            text-align: center;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+        }
+        
+        .title {
+            font-size: 2.8rem;
+            color: #1a1a1a;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+        
+        .subtitle {
+            color: #666;
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+        }
+        
+        .performance-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 15px;
+            background: #eff6ff;
+            border: 2px solid #3b82f6;
+            border-radius: 10px;
+            padding: 15px 25px;
+            color: #1e40af;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+        
+        .nav {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            text-align: center;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+        
+        .tab-button {
+            background: #f3f4f6;
+            border: none;
+            padding: 12px 30px;
+            margin: 0 5px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+        }
+        
+        .tab-button:hover {
+            background: #e5e7eb;
+            transform: translateY(-2px);
+        }
+        
+        .tab-button.active {
+            background: #1e40af;
+            color: white;
+            box-shadow: 0 4px 15px rgba(30, 64, 175, 0.4);
+        }
+        
+        .card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        }
+        
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .metric-card {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+            border-left: 5px solid transparent;
+        }
+        
+        .metric-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .metric-card.blue { border-left-color: #3b82f6; }
+        .metric-card.green { border-left-color: #10b981; }
+        .metric-card.purple { border-left-color: #8b5cf6; }
+        .metric-card.orange { border-left-color: #f59e0b; }
+        
+        .metric-title {
+            font-size: 0.95rem;
+            color: #6b7280;
+            margin-bottom: 8px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .metric-value {
+            font-size: 2.8rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+        
+        .metric-subtitle {
+            font-size: 0.9rem;
+            color: #9ca3af;
+        }
+        
+        .performance-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        
+        .table th,
+        .table td {
+            text-align: left;
+            padding: 12px 15px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        
+        .table th {
+            background: #f8fafc;
+            font-weight: 600;
+            color: #374151;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            letter-spacing: 0.5px;
+        }
+        
+        .table tr:hover {
+            background: #f9fafb;
+        }
+        
+        .performer-excellent { background: #f0fdf4; }
+        .performer-good { background: #fffbeb; }
+        .performer-needs-improvement { background: #fef2f2; }
+        
+        .status-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 8px;
+        }
+        
+        .dot-excellent { background: #10b981; }
+        .dot-good { background: #f59e0b; }
+        .dot-needs-improvement { background: #ef4444; }
+        
+        .progress-bar {
+            background: #e5e7eb;
+            border-radius: 10px;
+            height: 8px;
+            margin: 8px 0;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            border-radius: 10px;
+            transition: width 0.8s ease;
+        }
+        
+        .progress-excellent { background: linear-gradient(90deg, #10b981, #34d399); }
+        .progress-good { background: linear-gradient(90deg, #f59e0b, #fbbf24); }
+        .progress-needs-improvement { background: linear-gradient(90deg, #ef4444, #f87171); }
+        
+        .leaderboard-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 10px;
+            border-left: 4px solid transparent;
+            transition: transform 0.2s ease;
+        }
+        
+        .leaderboard-item:hover {
+            transform: translateX(5px);
+        }
+        
+        .rank-1 { background: #fef3c7; border-left-color: #f59e0b; }
+        .rank-2 { background: #f3f4f6; border-left-color: #9ca3af; }
+        .rank-3 { background: #fdf2f8; border-left-color: #ec4899; }
+        .rank-other { background: #f8fafc; border-left-color: #6b7280; }
+        
+        .rank-number {
+            font-size: 1.5rem;
+            font-weight: bold;
+            width: 40px;
+            text-align: center;
+        }
+        
+        .salesperson-info {
+            flex: 1;
+            margin-left: 15px;
+        }
+        
+        .salesperson-name {
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-bottom: 2px;
+        }
+        
+        .salesperson-stats {
+            font-size: 0.9rem;
+            color: #6b7280;
+        }
+        
+        .achievement-badge {
+            background: #10b981;
+            color: white;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        
+        .badge-excellent { background: #10b981; }
+        .badge-good { background: #f59e0b; }
+        .badge-needs-improvement { background: #ef4444; }
+        
+        .insights-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+        
+        .insight-card {
+            background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+            border-radius: 12px;
+            padding: 20px;
+            border-left: 4px solid #3b82f6;
+        }
+        
+        .insight-title {
+            font-weight: 600;
+            color: #1e40af;
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+        }
+        
+        .insight-text {
+            color: #1e3a8a;
+            line-height: 1.5;
+            font-size: 0.95rem;
+        }
+        
+        .conversion-funnel {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin: 20px 0;
+        }
+        
+        .funnel-step {
+            text-align: center;
+            flex: 1;
+        }
+        
+        .funnel-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #1e40af;
+            margin-bottom: 5px;
+        }
+        
+        .funnel-label {
+            font-size: 0.9rem;
+            color: #6b7280;
+            margin-bottom: 10px;
+        }
+        
+        .funnel-arrow {
+            font-size: 1.5rem;
+            color: #9ca3af;
+            margin: 0 10px;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        @media (max-width: 768px) {
+            .performance-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .title {
+                font-size: 2.2rem;
+            }
+            
+            .conversion-funnel {
+                flex-direction: column;
+            }
+            
+            .funnel-arrow {
+                transform: rotate(90deg);
+                margin: 10px 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1 class="title">NuLeaf Sales Performance Dashboard</h1>
+            <p class="subtitle">Team Performance Overview | Week of May 25, 2025</p>
+            <div class="performance-indicator">
+                📊 Team Achievement: 79.0% of Target | Conversion Rate: 40.2%
+            </div>
+        </div>
+
+        <!-- Navigation -->
+        <div class="nav">
+            <button class="tab-button active" onclick="showTab('overview')">Team Overview</button>
+            <button class="tab-button" onclick="showTab('individual')">Individual Performance</button>
+            <button class="tab-button" onclick="showTab('insights')">Insights & Actions</button>
+        </div>
+
+        <!-- Team Overview Tab -->
+        <div id="overview" class="tab-content active">
+            <!-- Key Metrics -->
+            <div class="metrics-grid">
+                <div class="metric-card blue">
+                    <div class="metric-title">Total Leads</div>
+                    <div class="metric-value" style="color: #3b82f6;">2,793</div>
+                    <div class="metric-subtitle">Initial + Follow-up</div>
+                </div>
+                <div class="metric-card green">
+                    <div class="metric-title">Total Sales</div>
+                    <div class="metric-value" style="color: #10b981;">1,124</div>
+                    <div class="metric-subtitle">Target: 1,422</div>
+                </div>
+                <div class="metric-card purple">
+                    <div class="metric-title">Team Conversion</div>
+                    <div class="metric-value" style="color: #8b5cf6;">40.2%</div>
+                    <div class="metric-subtitle">Above industry average</div>
+                </div>
+                <div class="metric-card orange">
+                    <div class="metric-title">Target Achievement</div>
+                    <div class="metric-value" style="color: #f59e0b;">79.0%</div>
+                    <div class="metric-subtitle">298 sales short</div>
+                </div>
+            </div>
+
+            <!-- Conversion Funnel -->
+            <div class="card">
+                <h3 style="margin-bottom: 20px; color: #1f2937;">Sales Conversion Funnel</h3>
+                <div class="conversion-funnel">
+                    <div class="funnel-step">
+                        <div class="funnel-number">2,793</div>
+                        <div class="funnel-label">Total Leads</div>
+                        <div class="progress-bar">
+                            <div class="progress-fill progress-excellent" style="width: 100%;"></div>
+                        </div>
+                    </div>
+                    <div class="funnel-arrow">→</div>
+                    <div class="funnel-step">
+                        <div class="funnel-number">1,124</div>
+                        <div class="funnel-label">Converted Sales</div>
+                        <div class="progress-bar">
+                            <div class="progress-fill progress-good" style="width: 40.2%;"></div>
+                        </div>
+                    </div>
+                    <div class="funnel-arrow">→</div>
+                    <div class="funnel-step">
+                        <div class="funnel-number">79%</div>
+                        <div class="funnel-label">Target Achievement</div>
+                        <div class="progress-bar">
+                            <div class="progress-fill progress-needs-improvement" style="width: 79%;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Performance Summary -->
+            <div class="performance-grid">
+                <div class="card">
+                    <h3 style="margin-bottom: 15px; color: #1f2937;">Lead Sources Performance</h3>
+                    <div style="margin: 12px 0; padding: 15px; background: #f0fdf4; border-radius: 8px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <span><strong>Follow-up Leads</strong></span>
+                            <span style="color: #10b981; font-weight: bold;">Higher conversion rate</span>
+                        </div>
+                        <p style="margin-top: 8px; color: #065f46; font-size: 0.9rem;">Follow-up leads consistently outperform initial contacts</p>
+                    </div>
+                    <div style="margin: 12px 0; padding: 15px; background: #eff6ff; border-radius: 8px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <span><strong>Initial Leads</strong></span>
+                            <span style="color: #3b82f6; font-weight: bold;">Volume opportunity</span>
+                        </div>
+                        <p style="margin-top: 8px; color: #1e40af; font-size: 0.9rem;">Focus on initial lead quality and nurturing process</p>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3 style="margin-bottom: 15px; color: #1f2937;">Team Highlights</h3>
+                    <div style="margin: 12px 0; padding: 15px; background: #fef3c7; border-radius: 8px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <span><strong>Top Performers</strong></span>
+                            <span style="color: #f59e0b; font-weight: bold;">4 above target</span>
+                        </div>
+                        <p style="margin-top: 8px; color: #92400e; font-size: 0.9rem;">Candice, Ed lead with 100%+ target achievement</p>
+                    </div>
+                    <div style="margin: 12px 0; padding: 15px; background: #fef2f2; border-radius: 8px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <span><strong>Development Needed</strong></span>
+                            <span style="color: #ef4444; font-weight: bold;">3 below 70%</span>
+                        </div>
+                        <p style="margin-top: 8px; color: #7f1d1d; font-size: 0.9rem;">Focus on coaching and process improvement</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Individual Performance Tab -->
+        <div id="individual" class="tab-content">
+            <div class="card">
+                <h3 style="margin-bottom: 20px; color: #1f2937;">Sales Team Leaderboard</h3>
+                
+                <!-- Top Performers -->
+                <div class="leaderboard-item rank-1">
+                    <div class="rank-number" style="color: #f59e0b;">🥇</div>
+                    <div class="salesperson-info">
+                        <div class="salesperson-name">Candice (Combined Performance)</div>
+                        <div class="salesperson-stats">378 Sales | 112% Target Achievement | 42% Conversion</div>
+                    </div>
+                    <div class="achievement-badge badge-excellent">Exceeds Target</div>
+                </div>
+
+                <div class="leaderboard-item rank-2">
+                    <div class="rank-number" style="color: #9ca3af;">🥈</div>
+                    <div class="salesperson-info">
+                        <div class="salesperson-name">Ed (Combined Performance)</div>
+                        <div class="salesperson-stats">310 Sales | 105% Target Achievement | 18% Conversion</div>
+                    </div>
+                    <div class="achievement-badge badge-excellent">Exceeds Target</div>
+                </div>
+
+                <div class="leaderboard-item rank-3">
+                    <div class="rank-number" style="color: #ec4899;">🥉</div>
+                    <div class="salesperson-info">
+                        <div class="salesperson-name">Kurt (Combined Performance)</div>
+                        <div class="salesperson-stats">269 Sales | 85% Target Achievement | 95% Conversion</div>
+                    </div>
+                    <div class="achievement-badge badge-good">Strong Performer</div>
+                </div>
+
+                <div class="leaderboard-item rank-other">
+                    <div class="rank-number" style="color: #6b7280;">4</div>
+                    <div class="salesperson-info">
+                        <div class="salesperson-name">Megan</div>
+                        <div class="salesperson-stats">83 Sales | 48% Target Achievement | 68% Conversion</div>
+                    </div>
+                    <div class="achievement-badge badge-needs-improvement">Needs Support</div>
+                </div>
+
+                <div class="leaderboard-item rank-other">
+                    <div class="rank-number" style="color: #6b7280;">5</div>
+                    <div class="salesperson-info">
+                        <div class="salesperson-name">Jeff</div>
+                        <div class="salesperson-stats">26 Sales | 43% Target Achievement | 52% Conversion</div>
+                    </div>
+                    <div class="achievement-badge badge-needs-improvement">Needs Support</div>
+                </div>
+
+                <div class="leaderboard-item rank-other">
+                    <div class="rank-number" style="color: #6b7280;">6</div>
+                    <div class="salesperson-info">
+                        <div class="salesperson-name">James</div>
+                        <div class="salesperson-stats">6 Sales | 9% Target Achievement | 50% Conversion</div>
+                    </div>
+                    <div class="achievement-badge badge-needs-improvement">Requires Coaching</div>
+                </div>
+            </div>
+
+            <!-- Detailed Performance Table -->
+            <div class="card">
+                <h3 style="margin-bottom: 20px; color: #1f2937;">Detailed Performance Metrics</h3>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Status</th>
+                            <th>Salesperson</th>
+                            <th>Total Leads</th>
+                            <th>Total Sales</th>
+                            <th>Target</th>
+                            <th>Achievement %</th>
+                            <th>Conversion %</th>
+                            <th>Initial Conv.</th>
+                            <th>Follow-up Conv.</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="performer-excellent">
+                            <td><span class="status-dot dot-excellent"></span></td>
+                            <td><strong>Candice</strong></td>
+                            <td>717</td>
+                            <td style="color: #10b981; font-weight: bold;">378</td>
+                            <td>378</td>
+                            <td style="color: #10b981; font-weight: bold;">100%+</td>
+                            <td>53%</td>
+                            <td>52%</td>
+                            <td>54%</td>
+                        </tr>
+                        <tr class="performer-excellent">
+                            <td><span class="status-dot dot-excellent"></span></td>
+                            <td><strong>Ed</strong></td>
+                            <td>1,715</td>
+                            <td style="color: #10b981; font-weight: bold;">310</td>
+                            <td>296</td>
+                            <td style="color: #10b981; font-weight: bold;">105%</td>
+                            <td>18%</td>
+                            <td>14%</td>
+                            <td>18%</td>
+                        </tr>
+                        <tr class="performer-good">
+                            <td><span class="status-dot dot-good"></span></td>
+                            <td><strong>Kurt</strong></td>
+                            <td>239</td>
+                            <td style="color: #f59e0b; font-weight: bold;">269</td>
+                            <td>350</td>
+                            <td style="color: #f59e0b; font-weight: bold;">77%</td>
+                            <td>113%</td>
+                            <td>60%</td>
+                            <td>88%</td>
+                        </tr>
+                        <tr class="performer-needs-improvement">
+                            <td><span class="status-dot dot-needs-improvement"></span></td>
+                            <td><strong>Megan</strong></td>
+                            <td>122</td>
+                            <td style="color: #ef4444; font-weight: bold;">83</td>
+                            <td>174</td>
+                            <td style="color: #ef4444; font-weight: bold;">48%</td>
+                            <td>68%</td>
+                            <td>37%</td>
+                            <td>51%</td>
+                        </tr>
+                        <tr class="performer-needs-improvement">
+                            <td><span class="status-dot dot-needs-improvement"></span></td>
+                            <td><strong>Jeff</strong></td>
+                            <td>0</td>
+                            <td style="color: #ef4444; font-weight: bold;">26</td>
+                            <td>60</td>
+                            <td style="color: #ef4444; font-weight: bold;">43%</td>
+                            <td>N/A</td>
+                            <td>50%</td>
+                            <td>N/A</td>
+                        </tr>
+                        <tr class="performer-needs-improvement">
+                            <td><span class="status-dot dot-needs-improvement"></span></td>
+                            <td><strong>James</strong></td>
+                            <td>0</td>
+                            <td style="color: #ef4444; font-weight: bold;">6</td>
+                            <td>108</td>
+                            <td style="color: #ef4444; font-weight: bold;">6%</td>
+                            <td>N/A</td>
+                            <td>50%</td>
+                            <td>N/A</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Performance Analysis -->
+            <div class="card" style="background: #fef2f2; border-left: 4px solid #ef4444;">
+                <h4 style="color: #991b1b; margin-bottom: 15px;">🎯 Performance Analysis & Focus Areas</h4>
+                <div style="color: #7f1d1d; line-height: 1.6;">
+                    <p style="margin: 8px 0;"><strong>Top Performers:</strong> Candice and Ed are exceeding targets with strong conversion rates and high volume management</p>
+                    <p style="margin: 8px 0;"><strong>Development Opportunities:</strong> Kurt shows excellent conversion rates but needs more lead volume to hit targets</p>
+                    <p style="margin: 8px 0;"><strong>Immediate Support Needed:</strong> Megan, Jeff, and James require coaching on lead conversion and target achievement strategies</p>
+                    <p style="margin: 8px 0;"><strong>Key Success Factor:</strong> Follow-up leads consistently show higher conversion rates across all performers</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Insights & Actions Tab -->
+        <div id="insights" class="tab-content">
+            <div class="insights-grid">
+                <div class="insight-card">
+                    <div class="insight-title">🚀 Key Success Drivers</div>
+                    <div class="insight-text">
+                        • Follow-up leads convert at significantly higher rates than initial contacts<br>
+                        • Top performers (Candice, Ed) excel at managing high lead volumes<br>
+                        • Conversion rates vary dramatically (18% to 113%) indicating process optimization opportunities
+                    </div>
+                </div>
+
+                <div class="insight-card">
+                    <div class="insight-title">⚠️ Areas for Improvement</div>
+                    <div class="insight-text">
+                        • Team is 298 sales short of collective target (-21%)<br>
+                        • 3 team members performing below 50% of target<br>
+                        • Lead distribution appears uneven across team members
+                    </div>
+                </div>
+
+                <div class="insight-card">
+                    <div class="insight-title">💡 Strategic Recommendations</div>
+                    <div class="insight-text">
+                        • Implement Kurt's conversion techniques across team<br>
+                        • Increase follow-up lead allocation to high converters<br>
+                        • Provide intensive coaching for underperforming members
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Plan -->
+            <div class="card">
+                <h3 style="margin-bottom: 20px; color: #1f2937;">Immediate Action Plan</h3>
+                
+                <div style="margin: 15px 0; padding: 20px; background: #fef3c7; border-radius: 10px; border-left: 4px solid #f59e0b;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                        <span style="font-weight: 600; color: #92400e;">Priority 1: Team Coaching (This Week)</span>
+                        <span style="color: #f59e0b; font-weight: bold;">High Impact</span>
+                    </div>
+                    <ul style="color: #92400e; margin-left: 20px; line-height: 1.6;">
+                        <li>Schedule 1-on-1 coaching sessions with James, Jeff, and Megan</li>
+                        <li>Analyze Kurt's conversion process for team training</li>
+                        <li>Review lead quality and assignment strategy</li>
+                    </ul>
+                </div>
+
+                <div style="margin: 15px 0; padding: 20px; background: #eff6ff; border-radius: 10px; border-left: 4px solid #3b82f6;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                        <span style="font-weight: 600; color: #1e40af;">Priority 2: Process Optimization (Next 2 Weeks)</span>
+                        <span style="color: #3b82f6; font-weight: bold;">Medium Impact</span>
+                    </div>
+                    <ul style="color: #1e40af; margin-left: 20px; line-height: 1.6;">
+                        <li>Standardize follow-up processes based on successful patterns</li>
+                        <li>Implement lead scoring and quality assessment</li>
+                        <li>Create conversion rate benchmarks and tracking</li>
+                    </ul>
+                </div>
+
+                <div style="margin: 15px 0; padding: 20px; background: #f0fdf4; border-radius: 10px; border-left: 4px solid #10b981;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                        <span style="font-weight: 600; color: #065f46;">Priority 3: Target Adjustment (Monthly Review)</span>
+                        <span style="color: #10b981; font-weight: bold;">Strategic</span>
+                    </div>
+                    <ul style="color: #065f46; margin-left: 20px; line-height: 1.6;">
+                        <li>Reassess individual targets based on lead allocation and conversion ability</li>
+                        <li>Implement team-based incentives to encourage collaboration</li>
+                        <li>Establish weekly performance check-ins and feedback loops</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Performance Targets -->
+            <div class="card">
+                <h3 style="text-align: center; margin-bottom: 30px; color: #1f2937;">Performance Improvement Targets</h3>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px;">
+                    <div style="text-align: center; padding: 20px; border: 2px solid #f59e0b; border-radius: 12px; background: #fffbeb;">
+                        <div style="font-size: 1.2rem; font-weight: bold; color: #f59e0b;">Current State</div>
+                        <div style="font-size: 2.5rem; font-weight: bold; margin: 10px 0; color: #92400e;">79%</div>
+                        <div style="color: #92400e;">Target Achievement</div>
+                    </div>
+                    <div style="text-align: center; padding: 20px; border: 2px solid #3b82f6; border-radius: 12px; background: #eff6ff;">
+                        <div style="font-size: 1.2rem; font-weight: bold; color: #3b82f6;">30-Day Goal</div>
+                        <div style="font-size: 2.5rem; font-weight: bold; margin: 10px 0; color: #1e40af;">90%</div>
+                        <div style="color: #1e40af;">Target Achievement</div>
+                    </div>
+                    <div style="text-align: center; padding: 20px; border: 2px solid #10b981; border-radius: 12px; background: #f0fdf4;">
+                        <div style="font-size: 1.2rem; font-weight: bold; color: #10b981;">60-Day Target</div>
+                        <div style="font-size: 2.5rem; font-weight: bold; margin: 10px 0; color: #065f46;">100%</div>
+                        <div style="color: #065f46;">Target Achievement</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showTab(tabName) {
+            // Hide all tab contents
+            const tabContents = document.querySelectorAll('.tab-content');
+            tabContents.forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            // Remove active class from all buttons
+            const tabButtons = document.querySelectorAll('.tab-button');
+            tabButtons.forEach(button => {
+                button.classList.remove('active');
+            });
+            
+            // Show selected tab content
+            document.getElementById(tabName).classList.add('active');
+            
+            // Add active class to clicked button
+            event.target.classList.add('active');
+        }
+    </script>
+</body>
+</html>
